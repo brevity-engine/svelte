@@ -1,0 +1,18 @@
+version = 1
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]
+  dialect = "typescript"
+  environment = [
+    "browser",
+    "nodejs"
+  ]
+  ecma_version = "2020"
+  module_system = "commonjs"
+
+[[transformers]]
+name = "prettier"
+enabled = true

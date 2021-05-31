@@ -1,32 +1,32 @@
-import * as assert from 'assert';
-import { readable, writable, derived, get } from '../../store';
+import * as assert from "assert";
+import { readable, writable, derived, get } from "../../store";
 
-describe('store', () => {
-	describe('writable', () => {
-		it('creates a writable store', () => {
+describe("store", () => {
+	describe("writable", () => {
+		it("creates a writable store", () => {
 			const count = writable(0);
 			const values = [];
 
-			const unsubscribe = count.subscribe(value => {
+			const unsubscribe = count.subscribe((value) => {
 				values.push(value);
 			});
 
 			count.set(1);
-			count.update(n => n + 1);
+			count.update((n) => n + 1);
 
 			unsubscribe();
 
 			count.set(3);
-			count.update(n => n + 1);
+			count.update((n) => n + 1);
 
 			assert.deepEqual(values, [0, 1, 2]);
 		});
 
-		it('creates an undefined writable store', () => {
+		it("creates an undefined writable store", () => {
 			const store = writable();
 			const values = [];
 
-			const unsubscribe = store.subscribe(value => {
+			const unsubscribe = store.subscribe((value) => {
 				values.push(value);
 			});
 
@@ -35,18 +35,18 @@ describe('store', () => {
 			assert.deepEqual(values, [undefined]);
 		});
 
-		it('calls provided subscribe handler', () => {
+		it("calls provided subscribe handler", () => {
 			let called = 0;
 
 			const store = writable(0, () => {
 				called += 1;
-				return () => called -= 1;
+				return () => (called -= 1);
 			});
 
-			const unsubscribe1 = store.subscribe(() => { });
+			const unsubscribe1 = store.subscribe(() => {});
 			assert.equal(called, 1);
 
-			const unsubscribe2 = store.subscribe(() => { });
+			const unsubscribe2 = store.subscribe(() => {});
 			assert.equal(called, 1);
 
 			unsubscribe1();
@@ -56,7 +56,7 @@ describe('store', () => {
 			assert.equal(called, 0);
 		});
 
-		it('does not assume immutable data', () => {
+		it("does not assume immutable data", () => {
 			const obj = {};
 			let called = 0;
 
@@ -69,40 +69,40 @@ describe('store', () => {
 			store.set(obj);
 			assert.equal(called, 2);
 
-			store.update(obj => obj);
+			store.update((obj) => obj);
 			assert.equal(called, 3);
 		});
 
-		it('only calls subscriber once initially, including on resubscriptions', () => {
+		it("only calls subscriber once initially, including on resubscriptions", () => {
 			let num = 0;
-			const store = writable(num, set => set(num += 1));
+			const store = writable(num, (set) => set((num += 1)));
 
 			let count1 = 0;
 			let count2 = 0;
 
-			store.subscribe(() => count1 += 1)();
+			store.subscribe(() => (count1 += 1))();
 			assert.equal(count1, 1);
 
-			const unsubscribe = store.subscribe(() => count2 += 1);
+			const unsubscribe = store.subscribe(() => (count2 += 1));
 			assert.equal(count2, 1);
 
 			unsubscribe();
 		});
 	});
 
-	describe('readable', () => {
-		it('creates a readable store', () => {
+	describe("readable", () => {
+		it("creates a readable store", () => {
 			let running;
 			let tick;
 
-			const store = readable(undefined, set => {
+			const store = readable(undefined, (set) => {
 				tick = set;
 				running = true;
 
 				set(0);
 
 				return () => {
-					tick = () => { };
+					tick = () => {};
 					running = false;
 				};
 			});
@@ -111,7 +111,7 @@ describe('store', () => {
 
 			const values = [];
 
-			const unsubscribe = store.subscribe(value => {
+			const unsubscribe = store.subscribe((value) => {
 				values.push(value);
 			});
 
@@ -128,11 +128,11 @@ describe('store', () => {
 			assert.deepEqual(values, [0, 1, 2]);
 		});
 
-		it('creates an undefined readable store', () => {
+		it("creates an undefined readable store", () => {
 			const store = readable();
 			const values = [];
 
-			const unsubscribe = store.subscribe(value => {
+			const unsubscribe = store.subscribe((value) => {
 				values.push(value);
 			});
 
@@ -141,11 +141,11 @@ describe('store', () => {
 			assert.deepEqual(values, [undefined]);
 		});
 
-		it('creates a readable store without updater', () => {
+		it("creates a readable store without updater", () => {
 			const store = readable(100);
 			const values = [];
 
-			const unsubscribe = store.subscribe(value => {
+			const unsubscribe = store.subscribe((value) => {
 				values.push(value);
 			});
 
@@ -159,19 +159,19 @@ describe('store', () => {
 		subscribe(fn) {
 			fn(42);
 			return {
-				unsubscribe: () => {}
+				unsubscribe: () => {},
 			};
-		}
+		},
 	};
 
-	describe('derived', () => {
-		it('maps a single store', () => {
+	describe("derived", () => {
+		it("maps a single store", () => {
 			const a = writable(1);
-			const b = derived(a, n => n * 2);
+			const b = derived(a, (n) => n * 2);
 
 			const values = [];
 
-			const unsubscribe = b.subscribe(value => {
+			const unsubscribe = b.subscribe((value) => {
 				values.push(value);
 			});
 
@@ -184,14 +184,14 @@ describe('store', () => {
 			assert.deepEqual(values, [2, 4]);
 		});
 
-		it('maps multiple stores', () => {
+		it("maps multiple stores", () => {
 			const a = writable(2);
 			const b = writable(3);
-			const c = derived(([a, b]), ([a, b]) => a * b);
+			const c = derived([a, b], ([a, b]) => a * b);
 
 			const values = [];
 
-			const unsubscribe = c.subscribe(value => {
+			const unsubscribe = c.subscribe((value) => {
 				values.push(value);
 			});
 
@@ -205,15 +205,19 @@ describe('store', () => {
 			assert.deepEqual(values, [6, 12, 20]);
 		});
 
-		it('passes optional set function', () => {
+		it("passes optional set function", () => {
 			const number = writable(1);
-			const evens = derived(number, (n, set) => {
-				if (n % 2 === 0) set(n);
-			}, 0);
+			const evens = derived(
+				number,
+				(n, set) => {
+					if (n % 2 === 0) set(n);
+				},
+				0
+			);
 
 			const values = [];
 
-			const unsubscribe = evens.subscribe(value => {
+			const unsubscribe = evens.subscribe((value) => {
 				values.push(value);
 			});
 
@@ -231,92 +235,93 @@ describe('store', () => {
 			assert.deepEqual(values, [0, 2, 4]);
 		});
 
-		it('prevents glitches', () => {
-			const lastname = writable('Jekyll');
-			const firstname = derived(lastname, n => n === 'Jekyll' ? 'Henry' : 'Edward');
+		it("prevents glitches", () => {
+			const lastname = writable("Jekyll");
+			const firstname = derived(lastname, (n) =>
+				n === "Jekyll" ? "Henry" : "Edward"
+			);
 
-			const fullname = derived([firstname, lastname], names => names.join(' '));
+			const fullname = derived([firstname, lastname], (names) =>
+				names.join(" ")
+			);
 
 			const values = [];
 
-			const unsubscribe = fullname.subscribe(value => {
+			const unsubscribe = fullname.subscribe((value) => {
 				values.push(value);
 			});
 
-			lastname.set('Hyde');
+			lastname.set("Hyde");
 
-			assert.deepEqual(values, [
-				'Henry Jekyll',
-				'Edward Hyde'
-			]);
+			assert.deepEqual(values, ["Henry Jekyll", "Edward Hyde"]);
 
 			unsubscribe();
 		});
 
-		it('prevents diamond dependency problem', () => {
+		it("prevents diamond dependency problem", () => {
 			const count = writable(0);
 			const values = [];
 
-			const a = derived(count, $count => {
-				return 'a' + $count;
+			const a = derived(count, ($count) => {
+				return "a" + $count;
 			});
 
-			const b = derived(count, $count => {
-				return 'b' + $count;
+			const b = derived(count, ($count) => {
+				return "b" + $count;
 			});
 
 			const combined = derived([a, b], ([a, b]) => {
 				return a + b;
 			});
 
-			const unsubscribe = combined.subscribe(v => {
+			const unsubscribe = combined.subscribe((v) => {
 				values.push(v);
 			});
 
-			assert.deepEqual(values, ['a0b0']);
+			assert.deepEqual(values, ["a0b0"]);
 
 			count.set(1);
-			assert.deepEqual(values, ['a0b0', 'a1b1']);
+			assert.deepEqual(values, ["a0b0", "a1b1"]);
 
 			unsubscribe();
 		});
 
-		it('derived dependency does not update and shared ancestor updates', () => {
-			const root = writable({ a: 0, b:0 });
+		it("derived dependency does not update and shared ancestor updates", () => {
+			const root = writable({ a: 0, b: 0 });
 			const values = [];
 
-			const a = derived(root, $root => {
-				return 'a' + $root.a;
+			const a = derived(root, ($root) => {
+				return "a" + $root.a;
 			});
 
 			const b = derived([a, root], ([$a, $root]) => {
-				return 'b' + $root.b + $a;
+				return "b" + $root.b + $a;
 			});
 
-			const unsubscribe = b.subscribe(v => {
+			const unsubscribe = b.subscribe((v) => {
 				values.push(v);
 			});
 
-			assert.deepEqual(values, ['b0a0']);
+			assert.deepEqual(values, ["b0a0"]);
 
 			root.set({ a: 0, b: 1 });
-			assert.deepEqual(values, ['b0a0', 'b1a0']);
+			assert.deepEqual(values, ["b0a0", "b1a0"]);
 
 			unsubscribe();
 		});
 
-		it('is updated with safe_not_equal logic', () => {
+		it("is updated with safe_not_equal logic", () => {
 			const arr = [0];
 
 			const number = writable(1);
-			const numbers = derived(number, $number => {
+			const numbers = derived(number, ($number) => {
 				arr[0] = $number;
 				return arr;
 			});
 
 			const concatenated = [];
 
-			const unsubscribe = numbers.subscribe(value => {
+			const unsubscribe = numbers.subscribe((value) => {
 				concatenated.push(...value);
 			});
 
@@ -328,7 +333,7 @@ describe('store', () => {
 			unsubscribe();
 		});
 
-		it('calls a cleanup function', () => {
+		it("calls a cleanup function", () => {
 			const num = writable(1);
 
 			const values = [];
@@ -344,7 +349,7 @@ describe('store', () => {
 
 			num.set(2);
 
-			const unsubscribe = d.subscribe(value => {
+			const unsubscribe = d.subscribe((value) => {
 				values.push(value);
 			});
 
@@ -359,7 +364,7 @@ describe('store', () => {
 			assert.deepEqual(cleaned_up, [2, 3, 4]);
 		});
 
-		it('discards non-function return values', () => {
+		it("discards non-function return values", () => {
 			const num = writable(1);
 
 			const values = [];
@@ -371,7 +376,7 @@ describe('store', () => {
 
 			num.set(2);
 
-			const unsubscribe = d.subscribe(value => {
+			const unsubscribe = d.subscribe((value) => {
 				values.push(value);
 			});
 
@@ -383,31 +388,31 @@ describe('store', () => {
 			unsubscribe();
 		});
 
-		it('allows derived with different types', () => {
-			const a = writable('one');
+		it("allows derived with different types", () => {
+			const a = writable("one");
 			const b = writable(1);
 			const c = derived([a, b], ([a, b]) => `${a} ${b}`);
 
-			assert.deepEqual(get(c), 'one 1');
+			assert.deepEqual(get(c), "one 1");
 
-			a.set('two');
+			a.set("two");
 			b.set(2);
-			assert.deepEqual(get(c), 'two 2');
+			assert.deepEqual(get(c), "two 2");
 		});
 
-		it('works with RxJS-style observables', () => {
-			const d = derived(fake_observable, _ => _);
+		it("works with RxJS-style observables", () => {
+			const d = derived(fake_observable, (_) => _);
 			assert.equal(get(d), 42);
 		});
 	});
 
-	describe('get', () => {
-		it('gets the current value of a store', () => {
-			const store = readable(42, () => { });
+	describe("get", () => {
+		it("gets the current value of a store", () => {
+			const store = readable(42, () => {});
 			assert.equal(get(store), 42);
 		});
 
-		it('works with RxJS-style observables', () => {
+		it("works with RxJS-style observables", () => {
 			assert.equal(get(fake_observable), 42);
 		});
 	});

@@ -2,12 +2,12 @@
 title: Auto-subscriptions
 ---
 
-The app in the previous example works, but there's a subtle bug — the store is subscribed to, but never unsubscribed. If the component was instantiated and destroyed many times, this would result in a *memory leak*.
+The app in the previous example works, but there's a subtle bug — the store is subscribed to, but never unsubscribed. If the component was instantiated and destroyed many times, this would result in a _memory leak_.
 
 Start by declaring `unsubscribe` in `App.svelte`:
 
 ```js
-const unsubscribe = count.subscribe(value => {
+const unsubscribe = count.subscribe((value) => {
 	count_value = value;
 });
 ```
@@ -16,15 +16,15 @@ You now declared `unsubscribe`, but it still needs be to called, for example thr
 
 ```html
 <script>
-	import { onDestroy } from 'svelte';
-	import { count } from './stores.js';
-	import Incrementer from './Incrementer.svelte';
-	import Decrementer from './Decrementer.svelte';
-	import Resetter from './Resetter.svelte';
+	import { onDestroy } from "svelte";
+	import { count } from "./stores.js";
+	import Incrementer from "./Incrementer.svelte";
+	import Decrementer from "./Decrementer.svelte";
+	import Resetter from "./Resetter.svelte";
 
 	let count_value;
 
-	const unsubscribe = count.subscribe(value => {
+	const unsubscribe = count.subscribe((value) => {
 		count_value = value;
 	});
 
@@ -38,10 +38,10 @@ It starts to get a bit boilerplatey though, especially if your component subscri
 
 ```html
 <script>
-	import { count } from './stores.js';
-	import Incrementer from './Incrementer.svelte';
-	import Decrementer from './Decrementer.svelte';
-	import Resetter from './Resetter.svelte';
+	import { count } from "./stores.js";
+	import Incrementer from "./Incrementer.svelte";
+	import Decrementer from "./Decrementer.svelte";
+	import Resetter from "./Resetter.svelte";
 </script>
 
 <h1>The count is {$count}</h1>
